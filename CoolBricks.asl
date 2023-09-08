@@ -1,18 +1,16 @@
 /*
 Cool Bricks (GBC) Autosplitter
 Authors: Roddy and Burndi
-Date: June 27, 2023
+Date: September 8, 2023
 
 Compatibility:
-    - VisualBoyAdvance-M 2.1.5 ( most recent version as of June 9, 2023. Now outdated. Version 2.1.6 was released in July 9, 2023 )
-    - BizHawk 2.8 ( outdated! add support to 2.9.1 later )
+    - VisualBoyAdvance-M 2.1.5, 2.1.6
+    - BizHawk 2.8 ( outdated! add support to 2.9.1 )
 
 shoutouts to katzi
 */
 
 state("VisualBoyAdvance-M", "vba_2.1.5") { // Version 2.1.5
-    // Notes: RAM  ($C000-$CFFF) pointer is 0x2758E30
-    //        WRAM ($D000-$DFFF) pointer is 0x2758E38
     byte RAM_START  : "visualboyadvance-m.exe", 0x02758E30, 0x00; // RAM at $C000
     byte Level      : "visualboyadvance-m.exe", 0x02758E38, 0xCFE;  // WRAM at $D000 + $0CFE
     byte end_screen : "visualboyadvance-m.exe", 0x02758E38, 0xCFF;  // set to 0E on congratulations screen
@@ -20,7 +18,14 @@ state("VisualBoyAdvance-M", "vba_2.1.5") { // Version 2.1.5
     byte start_game : "visualboyadvance-m.exe", 0x02758E38, 0xD4D;  // pressed on start game
 }
 
-// TODO: Add support for VBA 2.1.6 (released in July 9, 2023)
+state("VisualBoyAdvance-M", "vba_2.1.6") { // Version 2.1.6
+    byte RAM_START  : "visualboyadvance-m.exe", 0x26AA270, 0x00; // RAM at $C000
+    byte Level      : "visualboyadvance-m.exe", 0x26AA278, 0xCFE;  // WRAM at $D000 + $0CFE
+    byte end_screen : "visualboyadvance-m.exe", 0x26AA278, 0xCFF;  // set to 0E on congratulations screen
+    byte checkpoint : "visualboyadvance-m.exe", 0x26AA278, 0xD00;  // checkpoint
+    byte start_game : "visualboyadvance-m.exe", 0x26AA278, 0xD4D;  // pressed on start game
+}
+// 0x26AA210
 
 state("EmuHawk", "eh_2.8") {
     byte RAM_START  : "libgambatte.DLL", 0x77050, 0x128, 0x0000; // start of RAM $C000
@@ -41,6 +46,9 @@ startup {
 }
 
 init {
+    // Debug: Print program size in case a new emulator version is released:
+    // print(modules.First().ModuleMemorySize.ToString());
+
     vars.AlreadySplit = false;
     vars.LevelRecord = 1;
 
@@ -51,6 +59,9 @@ init {
             break;
             case 49872896:
                 version = "vba_2.1.5";
+            break;
+            case 49053696:
+                version = "vba_2.1.6";
             break;
         }
     }
